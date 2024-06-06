@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import Toast from 'react-native-toast-message';
 import { View, Dimensions, StyleSheet, Button, Image as RNImage, PixelRatio } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import Canvas, { Image as CanvasImage, CanvasRenderingContext2D } from 'react-native-canvas';
@@ -23,10 +22,6 @@ const CanvasComponent: React.FC = () => {
   let isDrawingStop = false;
 
   useEffect(() => {
-    Toast.show({
-      type: 'success',
-      text1: "text1"
-    })
     const backgroundCanvas = backgroundCanvasRef.current;
     if (backgroundCanvas) {
       backgroundCanvas.width = displayWidth;
