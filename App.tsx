@@ -4,8 +4,9 @@ import Maze from './src/maze'
 
 function App() {
   return (
-    <Puzzle />
-    // <Maze />
+    // <Puzzle />
+    <Maze />
+    
   )
 }
 
