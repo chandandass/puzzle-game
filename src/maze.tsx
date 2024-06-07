@@ -28,8 +28,8 @@ const CanvasComponent: React.FC = () => {
       backgroundCanvas.height = displayHeight;
       backgroundContext = backgroundCanvas.getContext('2d');
       loadImage(backgroundContext);
-      // backgroundContext.arc(155, 536, 5, 0,  2 * Math.PI)
-      // backgroundContext.fill();
+      backgroundContext.arc(displayWidth * .15, displayHeight * .55, 5, 0,  2 * Math.PI)
+      backgroundContext.fill();
       
     }
     
@@ -89,30 +89,37 @@ const CanvasComponent: React.FC = () => {
       return hex.length == 1 ? "0" + hex : hex;
     };
     
-    // Concatenate the hex values into a single string
     return "#" + hex(r) + hex(g) + hex(b)
+    // Concatenate the hex values into a single string
   }
   
   const loadImage = async (context: CanvasRenderingContext2D | null) => {
     if (context && backgroundCanvasRef.current) {
       const image = new CanvasImage(backgroundCanvasRef.current);
-      const imageUri = RNImage.resolveAssetSource(require('../assets/maze/meghuchiTest.png')).uri;
+      const imageUri = RNImage.resolveAssetSource(require('../assets/maze/path.png')).uri;
       
       convertImageToBase64(imageUri).then((base64String) => {
         if (base64String) {
-          image.src = mageImage;
+          image.src = base64String;
         }
       });
       
       image.addEventListener('load', () => {
-        imageDim = {width: image.width, height: image.height};
+        
+        const imageAR = image.width / image.height;
+        const widthPercent = 0.7;
+        const heightStart = 0.55;
+        console.log("imageAr", imageAR)
+        imageDim = {width: displayWidth * widthPercent, height: (displayWidth * widthPercent) / imageAR};
+        // console.log("half of wp: ", (1-widthPercent)/2)
+        // const pathStart = {x: displayWidth * ((1 - widthPercent)/2), y: displayWidth *  ((heightRatio * 3.5))}
         const heightRatio = (displayHeight / imageDim.height);
         const widthRatio = (displayWidth / imageDim.width);
-
+        console.log("imageDim: ", imageDim);
         finalStartPoint = {x: (startPoint.x * widthRatio), y: (startPoint.y * heightRatio)};
         finalEndPoint = {x: endPoint.x * widthRatio, y: endPoint.y * heightRatio, w: 10, h: 10};
-        drawingContext.fillRect(endPoint.x * widthRatio, endPoint.y * heightRatio, 10,10)
-        context.drawImage(image, 0, 0, displayWidth, displayHeight); 
+        drawingContext.fillRect(displayWidth * .15 + (((displayWidth * .7) / imageDim.width ) * 231.9), displayHeight * .55 + (((displayWidth * .7) / imageAR) / imageDim.height * 38.82), 10,10)
+        context.drawImage(image, displayWidth * .15, displayHeight * .55, displayWidth * .7, (displayWidth * .7) / imageAR); 
       });
     }
   };
@@ -120,8 +127,8 @@ const CanvasComponent: React.FC = () => {
   const clearDrawingCanvas = () => {
     if (drawingContext && drawingCanvasRef.current) {
       drawingContext.clearRect(0, 0, drawingCanvasRef.current.width, drawingCanvasRef.current.height);
-      finalStartPoint.x = startPoint.x * (displayWidth / imageDim.width)
-      finalStartPoint.y = startPoint.y * (displayHeight / imageDim.height)
+      // finalStartPoint.x = startPoint.x * (displayWidth / imageDim.width)
+      // finalStartPoint.y = startPoint.y * (displayHeight / imageDim.height)
     }
   };
   
@@ -160,19 +167,19 @@ const CanvasComponent: React.FC = () => {
           console.log(pixelData)
           const color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}, ${pixelData[3] / 255})`;
           const colorHex = rgbaToHex(pixelData[0], pixelData[1], pixelData[2], pixelData[3] / 255).toLowerCase()
-          if(PATH_COLOR.toLowerCase() == colorHex.toLowerCase()) {
-            // console.log("*************************** match found ******************************");
-            if( finalEndPoint.x <= x && x <= (finalEndPoint.x + finalEndPoint.w) &&  finalEndPoint.y <= y && y <= (finalEndPoint.y + finalEndPoint.h)) {
-              console.log("***game completed***")
-              isDrawingStop=true;
-            }
-          } else {
-            console.log("else x:y", x, y)
-            console.log("color hex: ", colorHex)
-            console.log("****game over*****");
-            isDrawingStop = true;
-            clearDrawingCanvas();
-          }
+          // if(PATH_COLOR.toLowerCase() == colorHex.toLowerCase()) {
+          //   // console.log("*************************** match found ******************************");
+          //   if( finalEndPoint.x <= x && x <= (finalEndPoint.x + finalEndPoint.w) &&  finalEndPoint.y <= y && y <= (finalEndPoint.y + finalEndPoint.h)) {
+          //     console.log("***game completed***")
+          //     isDrawingStop=true;
+          //   }
+          // } else {
+          //   console.log("else x:y", x, y)
+          //   console.log("color hex: ", colorHex)
+          //   console.log("****game over*****");
+          //   isDrawingStop = true;
+          //   clearDrawingCanvas();
+          // }
           // drawCircle(color);
       } catch (error) {
           console.error("Error getting pixel data:", error);
@@ -203,6 +210,7 @@ const CanvasComponent: React.FC = () => {
             ref={drawingCanvasRef}
             style={styles.canvas}
           />
+          <RNImage source={require("../assets/maze/background.png")} style={{position: "absolute", zIndex: -1}} resizeMode='cover' />
         </View>
       </PanGestureHandler>
       <View style={styles.controls}>
