@@ -1,14 +1,18 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Dimensions, StyleSheet, Button, Image as RNImage, PixelRatio } from 'react-native';
+import { View, Dimensions, StyleSheet, Button, Image as RNImage, PixelRatio, Text } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import Canvas, { Image as CanvasImage, CanvasRenderingContext2D } from 'react-native-canvas';
 import { mageImage } from './mageimage';
+import { pathImage } from './path';
+import { frog } from './frog';
+import { dragonfly } from './dragonfly';
+import { mazePath } from './mazePath';
 
 let { width: displayWidth, height: displayHeight } = Dimensions.get('window');
 const PATH_COLOR = '#F9F7DC'
 const startPoint = { x: 85 , y: 424 }
 const endPoint = { x: 165, y: 633 }
-
+console.log("displayWidth: ", displayWidth, "displayHeight: ", displayHeight)
 const CanvasComponent: React.FC = () => {
   const backgroundCanvasRef = useRef<Canvas | null>(null);
   const drawingCanvasRef = useRef<Canvas | null>(null);
@@ -28,8 +32,8 @@ const CanvasComponent: React.FC = () => {
       backgroundCanvas.height = displayHeight;
       backgroundContext = backgroundCanvas.getContext('2d');
       loadImage(backgroundContext);
-      backgroundContext.arc(displayWidth * .15, displayHeight * .55, 5, 0,  2 * Math.PI)
-      backgroundContext.fill();
+      // backgroundContext.arc(displayWidth * .15, displayHeight * .55, 5, 0,  2 * Math.PI)
+      // backgroundContext.fill();
       
     }
     
@@ -96,31 +100,61 @@ const CanvasComponent: React.FC = () => {
   const loadImage = async (context: CanvasRenderingContext2D | null) => {
     if (context && backgroundCanvasRef.current) {
       const image = new CanvasImage(backgroundCanvasRef.current);
-      const imageUri = RNImage.resolveAssetSource(require('../assets/maze/path.png')).uri;
+      const anim1 = new CanvasImage(backgroundCanvasRef.current);
+      const anim2 = new CanvasImage(backgroundCanvasRef.current);
+      // const imageUri = RNImage.resolveAssetSource(require('../assets/maze/path.png')).uri;
       
-      convertImageToBase64(imageUri).then((base64String) => {
-        if (base64String) {
-          image.src = base64String;
-        }
-      });
+      // convertImageToBase64(imageUri).then((base64String) => {
+      //   if (base64String) {
+      //     image.src = base64String;
+      //   }
+      //   });
       
+      image.src = pathImage;
+
       image.addEventListener('load', () => {
-        
+        // const pathContainer = { width: displayWidth * .7, height: displayHeight * .5}
+        const pathContainer = { width: 360, height: displayHeight * .5}
         const imageAR = image.width / image.height;
-        const widthPercent = 0.7;
-        const heightStart = 0.55;
+        const containerAr = pathContainer.width / pathContainer.height;
+        if(imageAR > containerAr) {
+          imageDim = {width: pathContainer.width, height: pathContainer.width / imageAR};
+          } else {
+          imageDim = {width: pathContainer.height, height: pathContainer.height * imageAR};
+        }
+ 
         console.log("imageAr", imageAR)
-        imageDim = {width: displayWidth * widthPercent, height: (displayWidth * widthPercent) / imageAR};
+        console.log("imageDim: ", imageDim);
+        // imageDim = {width: displayWidth * widthPercent, height: (displayWidth * widthPercent) / imageAR};
         // console.log("half of wp: ", (1-widthPercent)/2)
         // const pathStart = {x: displayWidth * ((1 - widthPercent)/2), y: displayWidth *  ((heightRatio * 3.5))}
         const heightRatio = (displayHeight / imageDim.height);
         const widthRatio = (displayWidth / imageDim.width);
+        const imageStarting = {x: (displayWidth - imageDim.width) / 2, y: displayHeight * .8  - imageDim.height}
         console.log("imageDim: ", imageDim);
         finalStartPoint = {x: (startPoint.x * widthRatio), y: (startPoint.y * heightRatio)};
         finalEndPoint = {x: endPoint.x * widthRatio, y: endPoint.y * heightRatio, w: 10, h: 10};
-        drawingContext.fillRect(displayWidth * .15 + (((displayWidth * .7) / imageDim.width ) * 231.9), displayHeight * .55 + (((displayWidth * .7) / imageAR) / imageDim.height * 38.82), 10,10)
-        context.drawImage(image, displayWidth * .15, displayHeight * .55, displayWidth * .7, (displayWidth * .7) / imageAR); 
+        // drawingContext.fillRect(displayWidth * .2 + (((displayWidth * .7) / imageDim.width ) * 231.9), displayHeight * .55 + (((displayWidth * .7) / imageAR) / imageDim.height * 38.82), 10,10)
+        // context.drawImage(image, displayWidth * .2, displayHeight * .9 - (displayWidth * widthPercent) / imageAR, displayWidth * widthPercent, (displayWidth * widthPercent) / imageAR); 
+        context.drawImage(image,  imageStarting.x, imageStarting.y, imageDim.width, imageDim.height); 
+        
+        anim1.src = frog;
+        anim2.src = dragonfly;
+        const anim1Diff = {x: -0.1, y: 0};
+        const anim2Diff = {x: 0, y: 0};
+        anim1.addEventListener('load', ()=> {
+          console.log("anim1")
+          context.drawImage(anim1, imageStarting.x + (displayWidth * anim1Diff.x), imageStarting.y - anim1.height + anim1Diff.y, anim1.width, anim1.height); 
+        })
+  
+        anim2.addEventListener('load', ()=> {
+          console.log("anim2")
+          // drawingContext.fillRect( displayWidth * .15, displayHeight * .45 + imageDim.height , 10,10)
+          context.drawImage(anim2, imageStarting.x + anim2Diff.x , imageStarting.y + imageDim.height + anim2Diff.y, anim2.width, anim2.height); 
+        })
       });
+
+
     }
   };
   
@@ -210,11 +244,14 @@ const CanvasComponent: React.FC = () => {
             ref={drawingCanvasRef}
             style={styles.canvas}
           />
-          <RNImage source={require("../assets/maze/background.png")} style={{position: "absolute", zIndex: -1}} resizeMode='cover' />
+          <RNImage source={require("../assets/maze/background.png")} style={{position:'absolute', zIndex: -1, width: "100%", height: "100%"}} resizeMode='cover' />
         </View>
       </PanGestureHandler>
       <View style={styles.controls}>
         <Button title="Clear Canvas" onPress={clearDrawingCanvas} />
+      </View>
+      <View style={styles.title}> 
+        <Text style={styles.titleText}>Help Meghuchi find the way to the dragonfly</Text>
       </View>
     </GestureHandlerRootView>
   );
@@ -233,11 +270,33 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   controls: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     paddingVertical: 10,
     zIndex: 2,
   },
+  title: {
+    position: 'absolute',
+    top: "8%",
+    left: "10%",
+    right: 0,
+    alignItems: 'center',
+    padding: 10,
+    maxWidth: "80%",
+    borderWidth: 1,
+    borderRadius: 30,
+    justifyContent: "center",
+    borderColor: '#C98936',
+    backgroundColor: '#009245',
+  }, 
+  titleText: {
+    color: "#FFFFFF", 
+    textAlign: 'center', 
+    letterSpacing: 1
+  }
 });
 
 export default CanvasComponent;
