@@ -7918,6 +7918,7 @@ __metadata:
     react-native-canvas: ^0.1.40
     react-native-gesture-handler: ^2.16.2
     react-native-reanimated: ^3.11.0
+    react-native-simple-toast: ^3.3.1
     react-native-webview: ^13.10.2
     react-test-renderer: 18.2.0
     typescript: 5.0.4
@@ -8029,6 +8030,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 5d0c6be5c9b6d933755e50895a1ec903100800a83b7b48fbc6a4242063f0de52a78f5af69d39da4241f6071a4416602f150c3a53e9a97d20880edb3612ffadbd
+  languageName: node
+  linkType: hard
+
+"react-native-simple-toast@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "react-native-simple-toast@npm:3.3.1"
+  peerDependencies:
+    react: "*"
+    react-native: ">=0.71.0"
+  checksum: 0f535a469b9519f761ee0224828df8e531fb92ad5e9accefdc04aafcd896da4c6fead488fe6911ccc11592f325707499f4b696768afd8c20cefe06fa6cdac50f
   languageName: node
   linkType: hard
 

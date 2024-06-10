@@ -15,6 +15,7 @@
     "react-native-canvas": "^0.1.40",
     "react-native-gesture-handler": "^2.16.2",
     "react-native-reanimated": "^3.11.0",
+    "react-native-simple-toast": "^3.3.1",
     "react-native-webview": "^13.10.2"
   },
   "devDependencies": {
