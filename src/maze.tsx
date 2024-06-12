@@ -169,8 +169,6 @@ const CanvasComponent: React.FC = () => {
       return;
     } ;
 
-    // absoluteX = absoluteX * .8;
-    // absoluteY = absoluteY * .8;
     let x = (xyDiff.x + absoluteX);
     let y = (xyDiff.y + absoluteY);
     switch (state) {
@@ -197,7 +195,7 @@ const CanvasComponent: React.FC = () => {
           console.log("x:y", x, y)
           const finalX = x * PixelRatio.get();
           const finalY = y * PixelRatio.get();
-          const pixelData = (await backgroundContext.getImageData(finalX, finalY, 3, 3)).data;
+          const pixelData = (await backgroundContext.getImageData(finalX, finalY, 1, 1)).data;
           console.log(pixelData)
           const color = `rgba(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]}, ${pixelData[3] / 255})`;
           const colorHex = rgbaToHex(pixelData[0], pixelData[1], pixelData[2], pixelData[3] / 255).toLowerCase()
